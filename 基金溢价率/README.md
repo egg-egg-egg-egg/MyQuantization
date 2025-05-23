@@ -1,6 +1,40 @@
-# 需求
+# 功能
 
 获取场内外LOF基金溢价信息，寻找套利机会。
+
+## 使用示例
+
+```python
+from lof import lof_premium
+
+def filter(df_lof):
+    """筛选出溢价率±5%的LOF基金"""
+    rate:int = 5 # 溢价率±5%
+    columns = ["场外代码",'场内代码', '名称', '最新价', '最新净值/万份收益', '溢价率%', '申购状态',
+       '赎回状态', '下一开放日',"买入确认日","卖出确认日", '购买起点', '日累计限定金额', '手续费']
+    
+    filtered_df = df_lof[(df_lof['溢价率%'] >= rate) | (df_lof['溢价率%'] <= -rate)][columns]
+
+    print(filtered_df)
+
+    
+if __name__ == "__main__":
+    df_lof:pd.DataFrame = lof_premium()
+    df = filter(df_lof)
+    print(df)
+    
+```
+
+对于筛选溢价率，有`filter_premium`方法可以用,筛出溢价率很方便。可以设置溢价率的阈值,会筛选出溢价率±阈值的基金。
+```python
+from lof import lof_premium,filter_premium
+
+if __name__ == "__main__":
+    df_lof:pd.DataFrame = lof_premium()
+    df = filter_premium(df_lof,8) # 筛选溢价率±8%的基金
+    print(df)
+    
+```
 
 # 关键信息
 

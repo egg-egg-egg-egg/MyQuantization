@@ -121,8 +121,13 @@ def lof_premium() -> pd.DataFrame:
     merged_df = pd.concat([merged_df, tn_df], axis=1)
     return merged_df
     
+def filter_premium(df_lof_premium:pd.DataFrame,rate:float=5) -> pd.DataFrame:
+    """
+    df_lof_premium: LOF基金溢价率数据
 
-
+    rate: 筛选出溢价率±rate%的LOF基金,默认筛选出溢价率±5%的LOF基金
+    """
+    return df_lof_premium[(df_lof_premium['溢价率%'] >= rate) | (df_lof_premium['溢价率%'] <= -rate)]
 # %%
 if __name__ == "__main__":
     df_lof = lof_premium()
