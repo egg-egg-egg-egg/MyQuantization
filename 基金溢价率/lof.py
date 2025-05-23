@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # %%
 import akshare as ak
 import pandas as pd
@@ -120,7 +119,6 @@ def lof_premium() -> pd.DataFrame:
     
     # 合并到 merged_df
     merged_df = pd.concat([merged_df, tn_df], axis=1)
-    print(merged_df.info())
     return merged_df
     
 
