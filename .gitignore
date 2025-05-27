@@ -1,7 +1,7 @@
 # doing project
 华泰pc自动化
 华泰pc自动化/notpush.toml
-
+基金溢价率/script.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
