@@ -7,6 +7,9 @@ import logging
 import os
 import time
 
+dir_path = os.path.dirname(os.path.abspath(__file__))
+os.chdir(dir_path)
+
 logger = logging.getLogger("logger")
 
 console_handler = logging.StreamHandler()
