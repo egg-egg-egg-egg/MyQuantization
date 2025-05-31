@@ -1,6 +1,7 @@
 # %%
 import akshare as ak
 import pandas as pd
+import numpy as np
 import requests
 from bs4 import BeautifulSoup
 import logging
@@ -16,7 +17,7 @@ console_handler = logging.StreamHandler()
 file_handler = logging.FileHandler(filename="lof_premium.log",encoding='utf-8')
 
 logger.setLevel(logging.DEBUG)
-console_handler.setLevel(logging.ERROR)
+console_handler.setLevel(logging.WARNING)
 file_handler.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter(
@@ -30,17 +31,21 @@ logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
 # %%
-def check_code(func):
-    def waper(row:pd.Series):
+def checkFundCode(row:pd.Series):
+    """
+    有数据审查功能的添加基金T+n信息的函数。如果基金代码遗传则会记录到日志
+    """
+    try:
         code = row["场外代码"]
-        if code is pd.NA:
-            logger.warning(f"{str(row)} 代码字段为空值，跳过")
-            return {}
-        else:
-            return func(code)
-    return waper
+    except Exception as e:
+        logger.critical("缺少 `场外代码` 字段")
+        raise e
+    if code is pd.NA or code is np.nan:
+        logger.warning(f"代码字段为空值,跳过\n{str(row)} ")
+        return {}
+    else:
+        return fund_tn_rules(code)
     
-@check_code
 def fund_tn_rules(fund_code:str|int):
     """
     - fund_code: 传入一个场外基金代码
@@ -73,6 +78,23 @@ def fund_tn_rules(fund_code:str|int):
     except Exception as e:
         logger.error(f"{fund_code} 代码获取买入确认日和卖出确认日时出错, url:{url}")
         return {}
+    
+def add_fund_tn_col(lof_df:pd.DataFrame):
+    """ 
+    - lof_df: 必须有`场外代码`字段, 表示基金的场外代码
+
+    给基金加上T+n信息,会添加上两个字段：["买入确认日","卖出确认日"]
+    """
+    
+    tn_info:pd.Series = lof_df.apply(checkFundCode, axis=1)
+    
+    # 将 tn_info 转换为 DataFrame
+    tn_df = pd.DataFrame(tn_info.tolist())
+    
+    # 合并到 lof_df
+    lof_df = pd.concat([lof_df, tn_df], axis=1)
+
+    return lof_df
 
 # %%
 def get_fund_data():
@@ -99,31 +121,6 @@ def calculate_premium(row):
         logger.error(f"计算溢价率异常：{str(e)}")
         return None
 
-
-def lof_premium() -> pd.DataFrame:
-    """
-    返回一个含有这些列名的DataFrame
-    `['场外代码', '基金简称', '最新净值/万份收益', '最新净值/万份收益-报告时间', '申购状态', '赎回状态', '下一开放日',
-       '购买起点', '日累计限定金额', 溢价率%, '手续费', '场内代码', '名称', '最新价', '涨跌额', '涨跌幅', '成交量', '成交额',
-       '开盘价', '最高价', '最低价', '昨收', '换手率', '流通市值', '总市值']`
-    """
-    merged_df = get_fund_data()
-    merged_df['溢价率%'] = merged_df.apply(calculate_premium, axis=1)
-
-    merged_df.sort_values(by='溢价率%', ascending=False, inplace=True)
-    merged_df.reset_index(drop=True, inplace=True)
-    merged_df.rename(columns={'基金代码': '场外代码', '代码': '场内代码'}, inplace=True)
-    
-    # 给基金加上T+n信息
-    tn_info = merged_df.apply(fund_tn_rules, axis=1)
-    
-    # 将 tn_info 转换为 DataFrame
-    tn_df = pd.DataFrame(tn_info.tolist())
-    
-    # 合并到 merged_df
-    merged_df = pd.concat([merged_df, tn_df], axis=1)
-    return merged_df
-    
 def filter_premium(df_lof_premium:pd.DataFrame,rate:float=5) -> pd.DataFrame:
     """
     df_lof_premium: LOF基金溢价率数据
@@ -131,15 +128,41 @@ def filter_premium(df_lof_premium:pd.DataFrame,rate:float=5) -> pd.DataFrame:
     rate: 筛选出溢价率±rate%的LOF基金,默认筛选出溢价率±5%的LOF基金
     """
     return df_lof_premium[(df_lof_premium['溢价率%'] >= rate) | (df_lof_premium['溢价率%'] <= -rate)]
+
+
+def lof_premium(rate:float|int = 5.0, t_n:bool=True) -> pd.DataFrame:
+    """
+    A股基金溢价率信息
+
+    含有以下列名：
+    `['场外代码', '基金简称', '最新净值/万份收益', '最新净值/万份收益-报告时间', '申购状态', '赎回状态', '下一开放日',
+       '购买起点', '日累计限定金额', 溢价率%, '手续费', '场内代码', '名称', '最新价', '涨跌额', '涨跌幅', '成交量', '成交额',
+       '开盘价', '最高价', '最低价', '昨收', '换手率', '流通市值', '总市值','买入确认日','卖出确认日']`
+       
+    ## Parameters
+        **rate** : float or int, default 5.0
+        默认筛选出基金溢价率±5%的基金
+
+        **t_n** : bool, default True
+        加上基金的T+n信息,若设置为False,返回结果将没有`["买入确认日","卖出确认日"]`字段
+    
+    """
+    merged_df = get_fund_data()
+    merged_df['溢价率%'] = merged_df.apply(calculate_premium, axis=1)
+
+    merged_df.sort_values(by='溢价率%', ascending=False, inplace=True)
+    merged_df.reset_index(drop=True, inplace=True)
+    merged_df.rename(columns={'基金代码': '场外代码', '代码': '场内代码'}, inplace=True)
+    filter_df = filter_premium(merged_df,rate)
+    return add_fund_tn_col(filter_df) if t_n else filter_df
+    
 # %%
 if __name__ == "__main__":
     df_lof = lof_premium()
-
-    rate:int = 5 # 溢价率±5%
     columns = ["场外代码",'场内代码', '名称', '最新价', '最新净值/万份收益', '溢价率%', '申购状态',
        '赎回状态', '下一开放日',"买入确认日","卖出确认日", '购买起点', '日累计限定金额', '手续费']
     
-    filtered_df = df_lof[(df_lof['溢价率%'] >= rate) | (df_lof['溢价率%'] <= -rate)][columns]
+    filtered_df = df_lof[columns]
     # 如果lof_premium文件夹不存在，则创建
     if not os.path.exists('lof_premium'):
         os.makedirs('lof_premium')

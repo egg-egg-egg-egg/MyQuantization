@@ -2,6 +2,8 @@
 华泰pc自动化
 华泰pc自动化/notpush.toml
 基金溢价率/script.py
+基金溢价率/定时任务.py
+基金溢价率/lof_premium
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
