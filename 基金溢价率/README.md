@@ -77,10 +77,6 @@ Data columns (total 27 columns):
 dtypes: float64(15), int64(2), object(10)
 ```
 
-# 文件说明
-
-lof.py: 获取场内外LOF基金溢价信息脚本。
-
 # 数据来源
 
 天天基金接口
