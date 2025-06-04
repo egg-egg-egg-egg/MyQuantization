@@ -1,3 +1,21 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+''' 
+一个获取基金溢价率的脚本 
+
+直接运行此脚本或者调用lof_premium函数
+
+```python
+from lof import lof_premium
+
+if __name__ == "__main__":
+    df_lof = lof_premium()   # 默认返回溢价率±5%的基金，并携带基金t+n信息
+    print(df_lof)
+```
+'''
+
+__author__ = 'Egg*4'
 # %%
 import akshare as ak
 import pandas as pd
