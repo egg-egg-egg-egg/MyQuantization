@@ -4,6 +4,11 @@
 
 ## 使用示例
 
+先保证运行如下命令
+```bash
+pip install -r requirements.txt
+```
+
 使用`lof_premium`即可获得基金溢价率信息。
 ```python
 from lof import lof_premium
@@ -67,17 +72,18 @@ dtypes: float64(15), int64(2), object(10)
 # 文件说明
 
 lof.py: 获取场内外LOF基金溢价信息脚本。
-定时任务.py: 定时任务脚本，定时调用`lof.py`获取数据，本地运行时可以使用。
 
 # 数据来源
 
 天天基金接口
 https://fund.eastmoney.com/161116.html
-基金档案：https://fundf10.eastmoney.com/jjfl_161129.html
+基金档案（获取T+n信息）：https://fundf10.eastmoney.com/jjfl_161129.html
 基金公告：https://fundf10.eastmoney.com/jjgg_161116.html
 
 # v0.2 (ing)
-考虑直接获取集思录的数据或并发获取数据。
+考虑爬集思录的数据或优化原版。
+
+集思录可能出现数据问题,2025/6/3出现过此问题。
 
 # v0.1 (now)
 
