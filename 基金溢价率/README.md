@@ -8,7 +8,7 @@
 ```bash
 pip install lof-fund
 ```
-
+----
 使用`lof_premium`即可获得基金溢价率信息。
 ```python
 from lof import lof_premium
@@ -18,7 +18,6 @@ if __name__ == "__main__":
     print(df_lof)
     
 ```
-
 或者直接控制台运行
 ```bash
 lofpm
@@ -86,11 +85,11 @@ https://fund.eastmoney.com/161116.html
 
 基金公告：https://fundf10.eastmoney.com/jjgg_161116.html
 
-# v0.2 (ing)
+# v2.0 (ing)
 考虑爬集思录的数据或优化原版。
 
 集思录可能出现数据问题,2025/6/3出现过此问题。
 
-# v0.1 (now)
+# v1 (now)
 
 使用akshare和爬虫程序完成了基本需求，但是速度较慢
