@@ -4,9 +4,9 @@
 
 ## 使用示例
 
-先保证运行如下命令
+先安装模块
 ```bash
-pip install -r requirements.txt
+pip install lof-fund
 ```
 
 使用`lof_premium`即可获得基金溢价率信息。
@@ -19,11 +19,19 @@ if __name__ == "__main__":
     
 ```
 
+或者直接控制台运行
+```bash
+lofpm
+```
+
 # 关键信息
 
 [x] 场内外基金的溢/折价
+
 [x] 基金申赎T日信息
+
 [x] 申赎状态
+
 [x] 申赎额度
 
 ## 可供选择的字段：
@@ -77,7 +85,9 @@ lof.py: 获取场内外LOF基金溢价信息脚本。
 
 天天基金接口
 https://fund.eastmoney.com/161116.html
+
 基金档案（获取T+n信息）：https://fundf10.eastmoney.com/jjfl_161129.html
+
 基金公告：https://fundf10.eastmoney.com/jjgg_161116.html
 
 # v0.2 (ing)

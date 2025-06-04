@@ -26,8 +26,6 @@ import logging
 import os
 import time
 
-dir_path = os.path.dirname(os.path.abspath(__file__))
-os.chdir(dir_path)
 
 logger = logging.getLogger("logger")
 
@@ -174,13 +172,13 @@ def lof_premium(rate:float|int = 5.0, t_n:bool=True) -> pd.DataFrame:
     filter_df = filter_premium(merged_df,rate)
     return add_fund_tn_col(filter_df) if t_n else filter_df
     
-# %%
-if __name__ == "__main__":
+
+def main():
     df_lof = lof_premium()
-    columns = ["场外代码",'场内代码', '名称', '最新价', '最新净值/万份收益', '溢价率%', '申购状态',
-       '赎回状态', '下一开放日',"买入确认日","卖出确认日", '购买起点', '日累计限定金额', '手续费']
+    # columns = ["场外代码",'场内代码', '名称', '最新价', '最新净值/万份收益', '溢价率%', '申购状态',
+    #    '赎回状态', '下一开放日',"买入确认日","卖出确认日", '购买起点', '日累计限定金额', '手续费']
     
-    filtered_df = df_lof[columns]
+    filtered_df = df_lof
     # 如果lof_premium文件夹不存在，则创建
     if not os.path.exists('lof_premium'):
         os.makedirs('lof_premium')
