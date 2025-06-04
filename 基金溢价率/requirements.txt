@@ -1,3 +1,5 @@
+chinesecalendar
+schedule
 requests
 pandas
 akshare
