@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="lof-fund",
-    version="1.1.1",
+    version="1.1.3",
     author="Egg*4",
     author_email="1127885315@qq.com",  # 替换为你的邮箱
     description="获取基金溢价率的脚本",

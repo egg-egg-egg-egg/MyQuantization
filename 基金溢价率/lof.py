@@ -78,6 +78,7 @@ def fund_tn_rules(fund_code:str|int):
         return {
             "买入确认日":"未代销",
             "卖出确认日":"未代销",
+            "jjfl_url" :url
         }
     try:
     # 获取买入确认日和卖出确认日
@@ -86,6 +87,7 @@ def fund_tn_rules(fund_code:str|int):
         t_n_info = {
             "买入确认日":buy_tn,
             "卖出确认日":sell_tn,
+            "jjfl_url" :url
         }
         return t_n_info
     except AttributeError as e:
@@ -143,8 +145,11 @@ def filter_premium(df_lof_premium:pd.DataFrame,rate:float=5) -> pd.DataFrame:
 
     rate: 筛选出溢价率±rate%的LOF基金,默认筛选出溢价率±5%的LOF基金
     """
-    return df_lof_premium[(df_lof_premium['溢价率%'] >= rate) | (df_lof_premium['溢价率%'] <= -rate)]
-
+    return (
+            df_lof_premium[
+            (df_lof_premium['溢价率%'] >= rate) | (df_lof_premium['溢价率%'] <= -rate)
+            ].sort_values(by="溢价率%",ascending=False).reset_index(drop=True)
+        )
 
 def lof_premium(rate:float|int = 5.0, t_n:bool=True) -> pd.DataFrame:
     """
@@ -167,7 +172,7 @@ def lof_premium(rate:float|int = 5.0, t_n:bool=True) -> pd.DataFrame:
     merged_df['溢价率%'] = merged_df.apply(calculate_premium, axis=1)
 
     merged_df.sort_values(by='溢价率%', ascending=False, inplace=True)
-    merged_df.reset_index(drop=True, inplace=True)
+
     merged_df.rename(columns={'基金代码': '场外代码', '代码': '场内代码'}, inplace=True)
     filter_df = filter_premium(merged_df,rate)
     return add_fund_tn_col(filter_df) if t_n else filter_df
@@ -189,4 +194,5 @@ def main():
     filtered_df.to_csv(save_path, index=False, encoding='utf-8-sig')
     logger.info(f"数据已保存到 {save_path}")
 
-    
+if __name__ == "__main__":
+    main()
